@@ -16,8 +16,8 @@ def step_gradient(b_current,m_current, points, learningRate):
         x = points[i, 0]
         y = points[i, 1]
         b_gradient += -(2/N) * (y - ((m_current * x) + b_current))
-        m_gradient += -(2/N) * x * (y - ((m_current * x) + b_current))
-        print(b_current - (learningRate * b_gradient),m_current - (learningRate * m_gradient))
+        m_gradient += -(2/N) * x * (y - ((m_current * x) + b_current))  
+
     new_b = b_current - (learningRate * b_gradient)
     new_m = m_current - (learningRate * m_gradient)
     return [new_b, new_m]
@@ -25,22 +25,44 @@ def step_gradient(b_current,m_current, points, learningRate):
 def gradient_descent_runner(points,starting_b,starting_m,learning_rate,num_interations):
     b = starting_b
     m = starting_m
+    lista_iteracoes = []
 
     for i in range(num_interations):
         b,m = step_gradient(b, m, array(points), learning_rate)
-        return [b,m]
+        lista_iteracoes.append([b,m])
 
+    print(lista_iteracoes)
+    return [b,m]
+
+def step_gradient_while(b_current, m_current, points, learningRate):
+    b_gradient = 0
+    m_gradient = 0
+    N = float(len(points))
+    i = 0
+    while(True):
+        x = points[i, 0]
+        y = points[i, 1]
+        b_gradient += -(2/N) * (y - ((m_current * x) + b_current))
+        m_gradient += -(2/N) * x * (y - ((m_current * x) + b_current))
+        rss = compute_error_for_line_given_points(b_gradient, m_gradient, points)
+
+        i += 1
+        if(rss < 0 or i >= N): break
+           
+    new_b = b_current - (learningRate * b_gradient)
+    new_m = m_current - (learningRate * m_gradient)
+    return [new_b, new_m]
 
 def run ():
-    points = genfromtxt("data.csv", delimiter=",")
+    points = genfromtxt("income.csv", delimiter=",")
     learning_rate = 0.0001
     initial_b = 0
     initial_m = 0
     num_iterations = 1000
-    print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
-    print "Running..."
+    print ("Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points)))
+    print ("Running...")
     [b, m] = gradient_descent_runner(points, initial_b, initial_m, learning_rate, num_iterations)
-    print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, b, m, compute_error_for_line_given_points(b, m, points))
+    print ("After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, b, m, compute_error_for_line_given_points(b, m, points)))
 
 if __name__ == '__main__':
     run() 
